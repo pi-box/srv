@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pibox"
+version = "1.0.0"
+description = "PI-Box Media Center"
+authors = [{name = "Moshe Waisman", email = "moshe.waisman@gmail.com"}]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+		"tornado",
+		"TgCrypto",
+    "pyrogram",
+]
+
+[tool.setuptools.package-data]
+"pibox" = ["public/**/*"]
+
+[project.scripts]
+pibox = "pibox.srv:main"
+setup_pibox = "pibox.setup_pibox:main"
