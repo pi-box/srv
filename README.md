@@ -202,7 +202,7 @@ Description=Pi-Box VLC Service
 After=network.target
 
 [Service]
-ExecStart=/bin/bash -c 'PYTHON_CLI_DIR=$(python -c "import os, sys; print(os.path.join(os.path.dirname(sys.executable), 'Scripts' if os.name == 'nt' else 'bin'))"); FILES_PATH="$PYTHON_CLI_DIR/files/*"; cvlc --loop --no-osd $FILES_PATH'
+ExecStart=/bin/bash -c 'cvlc --loop --no-osd /usr/local/bin/files/*'
 Restart=always
 User=root
 
