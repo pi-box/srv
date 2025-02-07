@@ -18,8 +18,7 @@ The installation has been tested on Raspberry Pi Zero 2 W.
 
 ### 2. Optional: Configure WiFi Without a Computer (Temporary Hotspot)
 
-📌 **How it Works?**
-When the Raspberry Pi is powered on, it will check for available WiFi networks. If no known network is found, it will start a hotspot, allowing you to connect via a phone or computer and configure the WiFi.
+📌 **How it Works?** When the Raspberry Pi is powered on, it will check for available WiFi networks. If no known network is found, it will start a hotspot, allowing you to connect via a phone or computer and configure the WiFi. The network setup can be done using a phone by connecting to the hotspot and accessing the management interface, as described in the section [Accessing the Pi-Box User Interface](#accessing-the-pi-box-user-interface).
 
 #### Create a Connection Management Script (AutoHotspot)
 
@@ -86,18 +85,7 @@ sudo systemctl start autohotspot
 
 #### Reboot and Connect to the Hotspot
 
-Now, when the RPi boots up without an available network, it will broadcast a WiFi network named `RPI_HOTSPOT` with the password `12345678`.
-
-- Connect to the network via your phone.
-- Open a browser and go to `192.168.4.1`.
-- Configure and save a permanent WiFi connection.
-
-Once configured, the device will automatically connect to the saved network when available.
-
-The installation has been tested on Raspberry Pi Zero 2 W.
-
-1. Flash Raspberry Pi OS (Lite recommended) onto an SD card using Raspberry Pi Imager.
-2. Configure WiFi without a computer by turning the Raspberry Pi into a temporary hotspot for initial setup.
+Now, when the RPi boots up without an available network, it will broadcast a WiFi network named `PIBOX_AP` with the password `12345678`. You can connect to this network using your phone and access the management interface, as detailed in the section [Accessing the Pi-Box User Interface](#accessing-the-pi-box-user-interface), to configure a permanent WiFi connection.
 
 ### 3. Install Required Packages
 
@@ -113,56 +101,44 @@ sudo apt install -y python3-pip git
 Clone and install the Pi-Box service:
 
 ```bash
-pip install git+https://github.com/pi-box/srv.git --break-system-packages
+sudo pip install git+https://github.com/pi-box/srv.git --break-system-packages
 ```
 
 ### 5. Setup Telegram API Credentials
 
 To enable syncing from Telegram:
 
-1. [Go to ](https://my.telegram.org/)[my.telegram.org](https://my.telegram.org/).
+1. [Go to](https://my.telegram.org/) [my.telegram.org](https://my.telegram.org/).
 2. Create a new application.
-3. Save the `api_key` and `api_hash`.
+3. Save the `api_id` and `api_hash`. These will be required in step 7.
 
 ### 6. Create a Telegram Group
 
-- It is recommended to create a private Telegram group where media files will be uploaded.
+- Create a Telegram group, preferably private.
+- Copy the group link in the format `t.me/+your_group_link_here`, as it will be required in step 7.
 
 ### 7. Run Initial Setup
 
-Run the setup script:
+Run the setup script and follow the prompts to enter the required information:
 
 ```bash
 sudo setup_pibox
 ```
 
+During the setup, you will be prompted to enter:
+
+- Your Telegram API ID
+- Your Telegram API Hash
+- Your phone number or bot token
+- Confirmation of the entered phone number
+- The confirmation code sent to your Telegram app
+- Your Telegram group link in the format `t.me/+your_group_link_here`
+
+Ensure that you have saved these details as noted in steps 5, 6.
+
 ### 8. Configure Auto-Start Service
 
 Create a system service to start Pi-Box on boot.
-
-1. Create a new service file:
-
-```bash
-sudo nano /etc/systemd/system/pibox.service
-```
-
-2. Add the following content:
-
-```ini
-[Unit]
-Description=Pi-Box Service
-After=network.target
-
-[Service]
-ExecStart=/usr/local/bin/pibox
-Restart=always
-User=root
-
-[Install]
-WantedBy=multi-user.target
-```
-
-3. Enable and start the service:
 
 ```bash
 sudo systemctl enable pibox
@@ -187,18 +163,21 @@ sudo sed -i 's/geteuid/getppid/' /usr/bin/vlc
 
 ### 11. Configure VLC as a System Service
 
-1. Create a new service file:
+Create a new service file:
 
 ```bash
 sudo nano /etc/systemd/system/pibox-vlc.service
 ```
 
-2. Add the following content:
+Add the following content:
 
 ```ini
 [Unit]
 Description=Pi-Box VLC Service
 After=network.target
+
+[Service]
+ExecStart=/bin/bash -c 'PYTHON_CLI_DIR=$(python -c "import os, sys; print(os.path.join(os.path.dirname(sys.executable), 'Scripts' if os.name == 'nt' else 'bin'))"); FILES_PATH="$PYTHON_CLI_DIR/files/*"; cvlc --loop --no-osd $FILES_PATH'
 Restart=always
 User=root
 
@@ -206,7 +185,7 @@ User=root
 WantedBy=multi-user.target
 ```
 
-3. Enable and start the VLC service:
+Enable and start the VLC service:
 
 ```bash
 sudo systemctl enable pibox-vlc
@@ -217,7 +196,7 @@ sudo systemctl start pibox-vlc
 
 You can access the Pi-Box service through its user interface when connected to the same network or WiFi:
 
-[http://pi-box.local](http://pi-box.local) (where `pi-box.local` is the hostname of your Raspberry Pi).
+[http://pi-box.local](http://pi-box.local) (where pi-box.local is the hostname of your Raspberry Pi).
 
 From this interface, you can manually trigger synchronization or configure a WiFi network.
 
