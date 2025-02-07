@@ -83,6 +83,8 @@ class SyncHandler(tornado.web.RequestHandler):
             files_exist = {file.split('.')[0]: file for file in os.listdir(files_dir) if file != "System Volume Information"}
             files_to_sync = []
 
+            await app.get_chat(config_data.get("group_link"))
+
             total_size = 0
             self.temp_size = 0
             async for msg in app.get_chat_history(group_id):
