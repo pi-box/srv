@@ -163,6 +163,15 @@ class SyncHandler(tornado.web.RequestHandler):
         
         return result
 
+    async def progress(self, current, total, size, total_size):
+        """Tracks and sends progress updates for file downloads."""
+        if current >= size:
+            self.temp_size += size
+            current = 0
+        msg = {"status": "ok", "_type": "progress", "_data": {"current": round((self.temp_size+current)/(1024*1024), 2), "total": round(total_size/(1024*1024), 2)}}
+        WebSocketServer.send_message(json.dumps(msg))
+
+
 class WebSocketServer(tornado.websocket.WebSocketHandler):
     """Handles WebSocket connections for real-time synchronization updates."""
     clients = set()
