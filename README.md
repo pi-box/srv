@@ -130,9 +130,7 @@ During the setup, you will be prompted to enter:
 
 - Your Telegram API ID
 - Your Telegram API Hash
-- Your phone number or bot token
-- Confirmation of the entered phone number
-- The confirmation code sent to your Telegram app
+- Your phone number & Confirmation code sent to you
 - Your Telegram group link in the format `t.me/+your_group_link_here`
 
 Ensure that you have saved these details as noted in steps 5, 6.
