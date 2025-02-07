@@ -63,7 +63,8 @@ Add the following content:
 ```ini
 [Unit]
 Description=AutoHotspot Service
-After=network.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 ExecStart=/usr/bin/autohotspot
@@ -208,4 +209,3 @@ You have successfully set up Pi-Box, which will now automatically sync media fro
 sudo journalctl -u pibox -f
 sudo journalctl -u pibox-vlc -f
 ```
-
