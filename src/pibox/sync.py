@@ -33,8 +33,6 @@ if not group_id:
 
 class SyncHandler(tornado.web.RequestHandler):
     """Handles synchronization of files from a Telegram group."""
-    def initialize(self):
-        self.cid = -1
 
     @app.on_message(filters.chat(group_id))
     @app.on_deleted_messages(filters.chat(group_id))
@@ -85,15 +83,9 @@ class SyncHandler(tornado.web.RequestHandler):
             files_exist = {file.split('.')[0]: file for file in os.listdir(files_dir) if file != "System Volume Information"}
             files_to_sync = []
 
-            if self.cid < 0:
-                chat = await app.get_chat(group_id)
-                if "ChatPreview" in str(type(chat)):
-                    chat = await app.join_chat(group_id)
-                self.cid = chat.id
-
             total_size = 0
             self.temp_size = 0
-            async for msg in app.get_chat_history(self.cid):
+            async for msg in app.get_chat_history(group_id):
                 file_info = None
                 if not msg.caption or "ignore" not in msg.caption:
                     msg_part = msg.document or msg.video or msg.animation or msg.photo
