@@ -10,6 +10,28 @@ import tornado.web
 import tornado.websocket
 from pyrogram import Client, filters
 
+"""
+Sync Module for Pi-Box
+
+This module manages synchronization of media files from a Telegram group to the Pi-Box system.
+It handles:
+- Downloading new media files from Telegram
+- Deleting outdated files
+- Extracting zip archives if necessary
+- Sending real-time progress updates via WebSockets
+
+Components:
+- SyncHandler: Handles HTTP requests to trigger synchronization.
+- WebSocketServer: Manages WebSocket communication with clients.
+
+Dependencies:
+- pyrogram: Used for Telegram API communication.
+- tornado: Web framework for handling requests and WebSocket communication.
+
+Configuration:
+- Expects `telegram.config` file containing Telegram API credentials and group ID.
+"""
+
 # Global variables
 running_task = None
 CLI_DIR = sysconfig.get_path("scripts")
@@ -34,28 +56,40 @@ if not group_id:
     raise ValueError("Group ID not found in config file.")
 
 class SyncHandler(tornado.web.RequestHandler):
-    """Handles synchronization of files from a Telegram group."""
+    """
+    Handles synchronization of media files from a Telegram group.
+    
+    - Listens for new, edited, or deleted messages in the group.
+    - Downloads and manages media files.
+    - Provides a `/sync/` endpoint to trigger synchronization.
+    - Provides a `/sync/status` endpoint to check synchronization status.
+    """
 
     @app.on_message(filters.chat(group_id))
     @app.on_deleted_messages(filters.chat(group_id))
     @app.on_edited_message(filters.chat(group_id))
     async def on_message(client, message):
-        """Handles new messages, edits, or deletions in the group."""
+        """Handles new, edited, or deleted messages in the group and triggers synchronization."""
         try:
             await asyncio.to_thread(requests.get, 'http://localhost/sync/')
         except Exception as e:
             print(f"Error in sync request: {e}")
 
     async def get(self, param=None):
-        """Handles GET requests for synchronization and status checks."""
+        """
+        Handles HTTP GET requests for synchronization.
+        
+        Routes:
+        - `/sync/`: Triggers full synchronization.
+        - `/sync/status`: Returns synchronization status.
+        """
         self.set_header("Access-Control-Allow-Origin", "*")
         try:
             if param is None:
                 result = await self.sync()
                 msg = result.copy()
                 msg["_type"] = "complete"
-                msg = json.dumps(msg)
-                WebSocketServer.send_message(msg)
+                WebSocketServer.send_message(json.dumps(msg))
             elif param == "status":
                 result = {"status": "ok"}
             else:
@@ -129,16 +163,8 @@ class SyncHandler(tornado.web.RequestHandler):
         
         return result
 
-    async def progress(self, current, total, size, total_size):
-        """Tracks and sends progress updates for file downloads."""
-        if current >= size:
-            self.temp_size += size
-            current = 0
-        msg = {"status": "ok", "_type": "progress", "_data": {"current": round((self.temp_size+current)/(1024*1024), 2), "total": round(total_size/(1024*1024), 2)}}
-        WebSocketServer.send_message(json.dumps(msg))
-
 class WebSocketServer(tornado.websocket.WebSocketHandler):
-    """Handles WebSocket connections for real-time updates."""
+    """Handles WebSocket connections for real-time synchronization updates."""
     clients = set()
 
     def check_origin(self, origin):

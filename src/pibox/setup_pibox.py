@@ -3,10 +3,32 @@ import json
 import sysconfig
 from pyrogram import Client
 
+"""
+Setup Script for Pi-Box
+
+This script initializes and configures the Pi-Box system by authenticating with the Telegram API
+and retrieving necessary configuration data.
+
+Features:
+- Loads or creates a configuration file (`telegram.config`).
+- Authenticates the Telegram client.
+- Retrieves and stores the Telegram group ID for media synchronization.
+
+Usage:
+Run this script to configure the Telegram integration before running the Pi-Box server.
+"""
+
 def get_group_id(client, group_link):
     """
     Retrieves the group ID from a given Telegram group link.
     If the chat is a preview, attempts to join the chat before retrieving the ID.
+    
+    Args:
+        client (Client): The initialized Telegram client.
+        group_link (str): The Telegram group invite link.
+    
+    Returns:
+        int: The group ID if successful, None otherwise.
     """
     try:
         chat = client.get_chat(group_link)
