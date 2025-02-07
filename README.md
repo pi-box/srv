@@ -141,6 +141,30 @@ Ensure that you have saved these details as noted in steps 5, 6.
 
 Create a system service to start Pi-Box on boot.
 
+Create a new service file:
+
+```bash
+sudo nano /etc/systemd/system/pibox.service
+```
+
+Add the following content:
+
+```ini
+[Unit]
+Description=Pi-Box Service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/pibox
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start the service:
+
 ```bash
 sudo systemctl enable pibox
 sudo systemctl start pibox
