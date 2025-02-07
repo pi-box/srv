@@ -5,13 +5,15 @@ import traceback
 import shutil
 import zipfile
 import requests
+import sysconfig
 import tornado.web
 import tornado.websocket
 from pyrogram import Client, filters
 
 # Global variables
 running_task = None
-CONFIG_FILE = "telegram.config"
+CLI_DIR = sysconfig.get_path("scripts")
+CONFIG_FILE = os.path.join(CLI_DIR, "telegram.config")
 
 # Initialize the Telegram client
 app = Client("telegram")
@@ -78,7 +80,7 @@ class SyncHandler(tornado.web.RequestHandler):
             await asyncio.gather(running_task)
         
         try:
-            files_dir = "files"
+            files_dir = os.path.join(CLI_DIR, "files")
             os.makedirs(files_dir, exist_ok=True)
             files_exist = {file.split('.')[0]: file for file in os.listdir(files_dir) if file != "System Volume Information"}
             files_to_sync = []
