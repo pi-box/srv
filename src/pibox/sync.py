@@ -34,7 +34,7 @@ Configuration:
 
 # Global variables
 running_task = None
-CLI_DIR = sysconfig.get_path("scripts")
+CLI_DIR = "" if os.name == 'nt' else sysconfig.get_path("scripts")
 CONFIG_FILE = os.path.join(CLI_DIR, "telegram.config")
 
 # Initialize the Telegram client
@@ -128,7 +128,7 @@ class SyncHandler(tornado.web.RequestHandler):
                 if not msg.caption or "ignore" not in msg.caption:
                     msg_part = msg.document or msg.video or msg.animation or msg.photo
                     if msg_part:
-                        file_info = msg_part.file_unique_id, msg_part.mime_type.split('/')[-1], msg_part.file_id, msg_part.file_size
+                        file_info = msg_part.file_unique_id, msg_part.mime_type.split('/')[-1] if not msg.photo else "jpg", msg_part.file_id, msg_part.file_size
                 if file_info:
                     base, size = file_info[0], file_info[3]
                     if base in files_exist:

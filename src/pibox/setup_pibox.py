@@ -44,7 +44,7 @@ def main():
     Main function to authenticate with Telegram, retrieve the group ID, and store configuration data.
     """
     SESSION_FILE = "telegram"
-    CLI_DIR = sysconfig.get_path("scripts")
+    CLI_DIR = "" if os.name == 'nt' else sysconfig.get_path("scripts")
     CONFIG_FILE = os.path.join(CLI_DIR, "telegram.config")
     
     config_data = {}
