@@ -1,5 +1,6 @@
 import os
 import json
+import sysconfig
 from pyrogram import Client
 
 def get_group_id(client, group_link):
@@ -21,7 +22,8 @@ def main():
     Main function to authenticate with Telegram, retrieve the group ID, and store configuration data.
     """
     SESSION_FILE = "telegram"
-    CONFIG_FILE = "telegram.config"
+    CLI_DIR = sysconfig.get_path("scripts")
+    CONFIG_FILE = os.path.join(CLI_DIR, "telegram.config")
     
     config_data = {}
     
