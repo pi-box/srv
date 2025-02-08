@@ -70,9 +70,6 @@ def main():
         client = Client(SESSION_FILE, api_id=api_id, api_hash=api_hash)
         client.start()
         print("Authentication successful! Session file created.")
-        
-        # Update config data with API credentials
-        config_data.update({"api_id": api_id, "api_hash": api_hash})
     
     # Ask for group link if not already stored
     if "group_id" not in config_data:
